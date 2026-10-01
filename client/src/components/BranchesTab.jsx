@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Store, MapPin, Phone, Users, Shield, Receipt, DollarSign } from 'lucide-react';
+import { Store, MapPin, Phone, Shield } from 'lucide-react';
 import { api } from '../services/api';
 
 export default function BranchesTab({ currentUser }) {
@@ -29,70 +29,65 @@ export default function BranchesTab({ currentUser }) {
 
   return (
     <div>
-      <div className="filter-bar">
-        <div>
-          <h2>Branch Network & Operations Team</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
-            Multi-branch physical locations, operational status, and role-based staff assignments
-          </p>
-        </div>
+      <div style={{ marginBottom: '20px' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Outlet Network & Authorized Staff</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
+          Physical branch locations in Goa and Role-Based Access Control (RBAC) hierarchy
+        </p>
       </div>
 
       {/* Branch Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', marginBottom: '24px' }}>
         {branches.map((b) => (
-          <div key={b.id} className="card" style={{ borderLeft: '4px solid var(--accent-primary)' }}>
+          <div key={b.id} className="clean-card" style={{ borderTop: '4px solid var(--brand-primary)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
               <div>
                 <span
                   style={{
-                    background: 'var(--bg-tertiary)',
+                    background: '#fef3c7',
+                    color: '#92400e',
                     padding: '2px 8px',
-                    borderRadius: 'var(--radius-sm)',
+                    borderRadius: '4px',
                     fontSize: '11px',
-                    fontWeight: 700,
-                    letterSpacing: '0.05em',
-                    color: 'var(--accent-gold)'
+                    fontWeight: 700
                   }}
                 >
-                  BRANCH #{b.code}
+                  BRANCH {b.code}
                 </span>
-                <h3 style={{ fontSize: '18px', marginTop: '6px' }}>{b.name}</h3>
+                <h3 style={{ fontSize: '16px', marginTop: '6px', fontWeight: 700 }}>{b.name}</h3>
               </div>
 
-              <span className="badge badge-success">
-                <span className="branch-dot" /> Operational
-              </span>
+              <span className="pill-badge badge-green">Operational</span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <MapPin size={15} color="var(--accent-primary)" />
+                <MapPin size={14} color="var(--brand-primary)" />
                 <span>{b.address}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Phone size={15} color="var(--accent-primary)" />
+                <Phone size={14} color="var(--brand-primary)" />
                 <span>{b.phone}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Shield size={15} color="var(--accent-primary)" />
+                <Shield size={14} color="var(--brand-primary)" />
                 <span>GSTIN: {b.gstin}</span>
               </div>
             </div>
 
             {/* Quick Metrics Bar for Branch */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', background: 'var(--bg-secondary)', padding: '12px', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', background: '#f8fafc', padding: '10px', borderRadius: 'var(--radius-md)' }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Staff</div>
-                <div style={{ fontSize: '15px', fontWeight: 700 }}>{b.staff_count}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700 }}>{b.staff_count}</div>
               </div>
-              <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border-subtle)', borderRight: '1px solid var(--border-subtle)' }}>
+              <div style={{ textAlign: 'center', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Orders</div>
-                <div style={{ fontSize: '15px', fontWeight: 700 }}>{b.total_orders}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700 }}>{b.total_orders}</div>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Revenue</div>
-                <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--accent-gold)' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--brand-primary)' }}>
                   ₹{Number(b.total_revenue).toLocaleString()}
                 </div>
               </div>
@@ -102,24 +97,19 @@ export default function BranchesTab({ currentUser }) {
       </div>
 
       {/* Staff and Team RBAC Directory */}
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div>
-            <h3 style={{ fontSize: '16px' }}>Authorized Staff & Access Permissions (RBAC)</h3>
-            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-              Role hierarchy: Owner (Universal) &gt; Manager (Branch Ops) &gt; Staff (POS Terminal)
-            </p>
-          </div>
+      <div className="clean-card" style={{ padding: 0 }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Team Directory & Role Hierarchy</h3>
         </div>
 
-        <div className="data-table-container">
-          <table className="data-table">
+        <div className="table-responsive" style={{ border: 'none' }}>
+          <table className="clean-table">
             <thead>
               <tr>
-                <th>Team Member</th>
-                <th>Assigned Role</th>
-                <th>Branch Assignment</th>
-                <th>Email ID</th>
+                <th>Employee Name</th>
+                <th>Role</th>
+                <th>Assigned Outlet</th>
+                <th>Login Email</th>
                 <th>Contact</th>
                 <th>Status</th>
               </tr>
@@ -131,16 +121,16 @@ export default function BranchesTab({ currentUser }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div
                         style={{
-                          width: '32px',
-                          height: '32px',
+                          width: '28px',
+                          height: '28px',
                           borderRadius: '50%',
-                          background: 'var(--bg-tertiary)',
+                          background: '#fef3c7',
+                          color: '#78350f',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontWeight: 700,
-                          fontSize: '12px',
-                          color: 'var(--accent-gold)'
+                          fontSize: '11px'
                         }}
                       >
                         {u.name
@@ -153,19 +143,27 @@ export default function BranchesTab({ currentUser }) {
                     </div>
                   </td>
                   <td>
-                    <span className={`role-chip role-${u.role}`}>{u.role}</span>
-                  </td>
-                  <td>
-                    <span style={{ fontSize: '13px' }}>
-                      {u.role === 'owner' ? 'All Outlets (Universal)' : u.branch_name || '-'}
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        background: u.role === 'owner' ? '#fef3c7' : u.role === 'manager' ? '#eff6ff' : '#ecfdf5',
+                        color: u.role === 'owner' ? '#92400e' : u.role === 'manager' ? '#1e40af' : '#065f46'
+                      }}
+                    >
+                      {u.role}
                     </span>
                   </td>
-                  <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                  <td>{u.role === 'owner' ? 'Universal Access' : u.branch_name || '-'}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted)' }}>
                     {u.email}
                   </td>
                   <td style={{ fontSize: '12.5px' }}>{u.phone || '-'}</td>
                   <td>
-                    <span className="badge badge-success">Active</span>
+                    <span className="pill-badge badge-green">Active</span>
                   </td>
                 </tr>
               ))}

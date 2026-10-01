@@ -21,7 +21,6 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
   const [selectedBranchId, setSelectedBranchId] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // If user is manager, lock to their branch
   useEffect(() => {
     if (currentUser?.role === 'manager' && currentUser.branchId) {
       setSelectedBranchId(String(currentUser.branchId));
@@ -63,28 +62,27 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
   const paymentBreakdown = metrics?.paymentBreakdown || [];
   const recentTrend = metrics?.recentTrend || [];
 
-  // Calculate highest revenue day for SVG chart scaling
   const maxDayRevenue = Math.max(...recentTrend.map((d) => Number(d.daily_revenue) || 0), 1000);
 
   return (
     <div>
-      {/* Top Filter Header */}
-      <div className="filter-bar">
+      {/* Scope Filter */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <h2>Executive Business Analytics</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
-            Consolidated revenue, branch sales performance, and operational KPIs
+          <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Executive Business Overview</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
+            Multi-branch revenue consolidation, average ticket sizes, and sales velocity
           </p>
         </div>
 
-        <div className="branch-select-group">
-          <Store size={16} color="var(--accent-primary)" />
-          <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Branch Scope:</span>
-          {currentUser?.role === 'owner' ? (
+        {currentUser?.role === 'owner' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Filter Scope:</span>
             <select
-              className="custom-select"
+              className="form-input-clean"
               value={selectedBranchId}
               onChange={(e) => setSelectedBranchId(e.target.value)}
+              style={{ fontWeight: 500 }}
             >
               <option value="">All Outlets (Consolidated)</option>
               {branches.map((b) => (
@@ -93,77 +91,74 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
                 </option>
               ))}
             </select>
-          ) : (
-            <span style={{ fontWeight: 600, color: 'var(--accent-gold)' }}>
-              {currentUser?.branchName || 'Assigned Branch'}
-            </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="kpi-grid">
-        <div className="card kpi-card">
-          <div className="kpi-icon-box kpi-icon-amber">
-            <DollarSign size={24} />
+      {/* KPI Row */}
+      <div className="kpi-row">
+        <div className="kpi-box">
+          <div className="kpi-icon-circle" style={{ background: '#fef3c7', color: 'var(--brand-primary)' }}>
+            <DollarSign size={22} />
           </div>
           <div>
-            <div className="kpi-label">Gross Revenue</div>
-            <div className="kpi-value">₹{kpis.totalRevenue.toLocaleString()}</div>
-            <div style={{ fontSize: '11.5px', color: 'var(--status-success)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-              <ArrowUpRight size={13} />
-              <span>Real-time POS synced</span>
+            <div className="kpi-title">Gross Revenue</div>
+            <div className="kpi-val">₹{kpis.totalRevenue.toLocaleString()}</div>
+            <div style={{ fontSize: '11px', color: 'var(--status-success)', display: 'flex', alignItems: 'center', gap: '2px', fontWeight: 600 }}>
+              <ArrowUpRight size={12} /> Live POS Synced
             </div>
           </div>
         </div>
 
-        <div className="card kpi-card">
-          <div className="kpi-icon-box kpi-icon-green">
-            <ShoppingBag size={24} />
+        <div className="kpi-box">
+          <div className="kpi-icon-circle" style={{ background: '#ecfdf5', color: 'var(--status-success)' }}>
+            <ShoppingBag size={22} />
           </div>
           <div>
-            <div className="kpi-label">Orders Completed</div>
-            <div className="kpi-value">{kpis.totalOrders}</div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+            <div className="kpi-title">Orders Completed</div>
+            <div className="kpi-val">{kpis.totalOrders}</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
               Across {selectedBranchId ? '1 branch' : `${branches.length} branches`}
             </div>
           </div>
         </div>
 
-        <div className="card kpi-card">
-          <div className="kpi-icon-box kpi-icon-blue">
-            <TrendingUp size={24} />
+        <div className="kpi-box">
+          <div className="kpi-icon-circle" style={{ background: '#eff6ff', color: 'var(--status-info)' }}>
+            <TrendingUp size={22} />
           </div>
           <div>
-            <div className="kpi-label">Avg. Order Value</div>
-            <div className="kpi-value">₹{kpis.averageOrderValue.toFixed(0)}</div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>Per customer ticket</div>
+            <div className="kpi-title">Avg. Ticket Size</div>
+            <div className="kpi-val">₹{kpis.averageOrderValue.toFixed(0)}</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Per customer order</div>
           </div>
         </div>
 
-        <div className="card kpi-card">
-          <div className={`kpi-icon-box ${kpis.lowStockAlerts > 0 ? 'kpi-icon-red' : 'kpi-icon-green'}`}>
-            <AlertTriangle size={24} />
+        <div className="kpi-box">
+          <div
+            className="kpi-icon-circle"
+            style={{
+              background: kpis.lowStockAlerts > 0 ? '#fef2f2' : '#ecfdf5',
+              color: kpis.lowStockAlerts > 0 ? 'var(--status-danger)' : 'var(--status-success)'
+            }}
+          >
+            <AlertTriangle size={22} />
           </div>
           <div>
-            <div className="kpi-label">Low Stock Alerts</div>
-            <div className="kpi-value">{kpis.lowStockAlerts}</div>
-            <div style={{ fontSize: '11.5px', color: kpis.lowStockAlerts > 0 ? 'var(--status-danger)' : 'var(--status-success)' }}>
-              {kpis.lowStockAlerts > 0 ? 'Immediate reorder needed' : 'All stocks healthy'}
+            <div className="kpi-title">Low Stock Items</div>
+            <div className="kpi-val">{kpis.lowStockAlerts}</div>
+            <div style={{ fontSize: '11px', color: kpis.lowStockAlerts > 0 ? 'var(--status-danger)' : 'var(--status-success)', fontWeight: 600 }}>
+              {kpis.lowStockAlerts > 0 ? 'Action required' : 'Stock healthy'}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Charts & Analytics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+      {/* Analytics Charts Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px', marginBottom: '24px' }}>
         {/* Branch Revenue Comparison */}
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '16px' }}>Branch Revenue Comparison</h3>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Goa Outlets</span>
-          </div>
-
+        <div className="clean-card">
+          <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '16px' }}>Outlet Revenue Performance</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {branchBreakdown.map((b) => {
               const maxRev = Math.max(...branchBreakdown.map((item) => Number(item.branch_revenue) || 1));
@@ -171,23 +166,23 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
 
               return (
                 <div key={b.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13.5px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
                     <span style={{ fontWeight: 600 }}>{b.name}</span>
-                    <span style={{ color: 'var(--accent-gold)', fontWeight: 700 }}>
+                    <span style={{ fontWeight: 700, color: 'var(--brand-primary)' }}>
                       ₹{Number(b.branch_revenue).toLocaleString()}
-                      <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '12px', marginLeft: '6px' }}>
-                        ({b.branch_orders} orders)
+                      <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '11.5px', marginLeft: '6px' }}>
+                        ({b.branch_orders} bills)
                       </span>
                     </span>
                   </div>
-                  <div style={{ width: '100%', height: '8px', background: 'var(--bg-input)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
                     <div
                       style={{
                         width: `${pct}%`,
                         height: '100%',
-                        background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-gold))',
+                        background: 'var(--brand-primary)',
                         borderRadius: '4px',
-                        transition: 'width 0.6s ease'
+                        transition: 'width 0.5s ease'
                       }}
                     />
                   </div>
@@ -197,14 +192,11 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
           </div>
         </div>
 
-        {/* 7-Day Revenue Trend Line Chart (SVG) */}
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '16px' }}>7-Day Revenue Trend</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-              <Calendar size={13} />
-              <span>Daily Performance</span>
-            </div>
+        {/* 7-Day Revenue Trend (Clean Line SVG) */}
+        <div className="clean-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Daily Sales Trend</h3>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Last 7 Days</span>
           </div>
 
           {recentTrend.length > 0 ? (
@@ -212,13 +204,12 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
               <div style={{ height: '140px', width: '100%', position: 'relative', marginTop: '10px' }}>
                 <svg viewBox="0 0 350 120" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                   <defs>
-                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#e58e26" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#e58e26" stopOpacity="0.0" />
+                    <linearGradient id="lightGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#d97706" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#d97706" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
 
-                  {/* Draw filled area and polyline */}
                   {(() => {
                     const points = recentTrend.map((d, idx) => {
                       const x = (idx / Math.max(recentTrend.length - 1, 1)) * 320 + 15;
@@ -231,15 +222,15 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
 
                     return (
                       <>
-                        <path d={areaD} fill="url(#chartGradient)" />
-                        <path d={pathD} fill="none" stroke="#e58e26" strokeWidth="3" strokeLinecap="round" />
+                        <path d={areaD} fill="url(#lightGradient)" />
+                        <path d={pathD} fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
                         {points.map((p, idx) => (
                           <g key={idx}>
-                            <circle cx={p.x} cy={p.y} r="5" fill="#f6b93b" stroke="#171514" strokeWidth="2" />
+                            <circle cx={p.x} cy={p.y} r="4" fill="#d97706" stroke="#ffffff" strokeWidth="2" />
                             <text
                               x={p.x}
-                              y={p.y - 10}
-                              fill="#f8f6f0"
+                              y={p.y - 8}
+                              fill="#1f2937"
                               fontSize="9.5"
                               textAnchor="middle"
                               fontWeight="600"
@@ -262,17 +253,16 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)' }}>
-              No orders recorded in this date range.
+              No sales data recorded.
             </div>
           )}
         </div>
       </div>
 
-      {/* Second Row: Top Products & Payment Modes */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-        {/* Top 5 Best Selling Menu Items */}
-        <div className="card">
-          <h3 style={{ fontSize: '16px', marginBottom: '14px' }}>Top Selling Artisanal Items</h3>
+      {/* Top Items & Payment Breakdown */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+        <div className="clean-card">
+          <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '14px' }}>Top Selling Products</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {topItems.map((item, idx) => (
               <div
@@ -282,19 +272,19 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 12px',
-                  background: 'var(--bg-secondary)',
+                  background: 'var(--bg-card-subtle)',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid rgba(255, 255, 255, 0.04)'
+                  border: '1px solid var(--border-light)'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span
                     style={{
-                      width: '24px',
-                      height: '24px',
+                      width: '22px',
+                      height: '22px',
                       borderRadius: '50%',
-                      background: idx === 0 ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-                      color: idx === 0 ? '#000' : 'var(--text-primary)',
+                      background: idx === 0 ? 'var(--brand-primary)' : '#e5e7eb',
+                      color: idx === 0 ? '#fff' : '#4b5563',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -304,123 +294,100 @@ export default function DashboardTab({ currentUser, onViewReceipt }) {
                   >
                     #{idx + 1}
                   </span>
-                  <span style={{ fontWeight: 600 }}>{item.item_name}</span>
+                  <span style={{ fontWeight: 600, fontSize: '13px' }}>{item.item_name}</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>₹{Number(item.total_sales).toLocaleString()}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.units_sold} cups/plates sold</div>
+                  <div style={{ fontWeight: 700, color: 'var(--brand-primary)' }}>₹{Number(item.total_sales).toLocaleString()}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.units_sold} ordered</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Payment Channels Breakdown */}
-        <div className="card">
-          <h3 style={{ fontSize: '16px', marginBottom: '14px' }}>Payment Method Settlement</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {paymentBreakdown.map((p, idx) => {
-              const iconMap = {
-                upi: <Smartphone size={18} color="#10b981" />,
-                card: <CreditCard size={18} color="#3b82f6" />,
-                cash: <Banknote size={18} color="#f59e0b" />
-              };
-
-              return (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px 14px',
-                    background: 'var(--bg-secondary)',
-                    borderRadius: 'var(--radius-md)'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {iconMap[p.payment_method] || <CreditCard size={18} />}
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '13px' }}>
-                        {p.payment_method}
-                      </div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.count} transactions settled</div>
-                    </div>
+        <div className="clean-card">
+          <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '14px' }}>Payment Mode Breakdown</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {paymentBreakdown.map((p, idx) => (
+              <div
+                key={idx}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 12px',
+                  background: 'var(--bg-card-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-light)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '12.5px' }}>
+                    {p.payment_method}
                   </div>
-                  <div style={{ textAlign: 'right', fontWeight: 700, color: 'var(--text-primary)', fontSize: '15px' }}>
-                    ₹{Number(p.amount).toLocaleString()}
-                  </div>
+                  <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>({p.count} bills)</span>
                 </div>
-              );
-            })}
+                <strong style={{ fontSize: '14px' }}>₹{Number(p.amount).toLocaleString()}</strong>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Recent Orders History Table */}
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div>
-            <h3 style={{ fontSize: '16px' }}>Live Order Ledger</h3>
-            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>Recent transactions across POS billing terminals</p>
-          </div>
+      {/* Recent Orders Table */}
+      <div className="clean-card" style={{ padding: 0 }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 700 }}>Recent Transaction Ledger</h3>
         </div>
 
-        <div className="data-table-container">
-          <table className="data-table">
+        <div className="table-responsive" style={{ border: 'none' }}>
+          <table className="clean-table">
             <thead>
               <tr>
                 <th>Order #</th>
                 <th>Branch</th>
-                <th>Guest / Table</th>
-                <th>Type</th>
-                <th>Items Ordered</th>
+                <th>Guest</th>
+                <th>Dining</th>
+                <th>Items</th>
                 <th>Payment</th>
-                <th>Total</th>
-                <th>Action</th>
+                <th>Amount</th>
+                <th>Receipt</th>
               </tr>
             </thead>
             <tbody>
               {recentOrders.map((order) => (
                 <tr key={order.id}>
                   <td>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--accent-primary)' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--brand-primary)' }}>
                       {order.order_number}
                     </span>
                   </td>
-                  <td>
-                    <span style={{ fontSize: '12.5px' }}>{order.branch_name}</span>
-                  </td>
+                  <td>{order.branch_name}</td>
                   <td>
                     <div>{order.customer_name}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{order.table_number}</div>
                   </td>
                   <td>
-                    <span className={`badge ${order.order_type === 'dine_in' ? 'badge-success' : 'badge-warning'}`}>
+                    <span className={`pill-badge ${order.order_type === 'dine_in' ? 'badge-green' : 'badge-amber'}`}>
                       {order.order_type === 'dine_in' ? 'Dine In' : 'Takeaway'}
                     </span>
                   </td>
-                  <td style={{ fontSize: '12.5px', maxWidth: '240px' }}>
+                  <td style={{ fontSize: '12.5px' }}>
                     {order.items?.map((it) => `${it.quantity}x ${it.item_name}`).join(', ') || '-'}
                   </td>
-                  <td>
-                    <span style={{ textTransform: 'uppercase', fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                      {order.payment_method}
-                    </span>
+                  <td style={{ textTransform: 'uppercase', fontSize: '11.5px', fontWeight: 600 }}>
+                    {order.payment_method}
                   </td>
                   <td>
-                    <strong style={{ color: 'var(--accent-gold)' }}>₹{Number(order.total_amount).toFixed(2)}</strong>
+                    <strong>₹{Number(order.total_amount).toFixed(2)}</strong>
                   </td>
                   <td>
                     <button
-                      className="btn-secondary"
-                      style={{ padding: '4px 10px', fontSize: '12px' }}
+                      className="btn-outline-neutral"
+                      style={{ padding: '4px 10px', fontSize: '11.5px' }}
                       onClick={() => onViewReceipt(order)}
                     >
-                      <Receipt size={13} />
-                      <span>Receipt</span>
+                      <Receipt size={13} /> Bill
                     </button>
                   </td>
                 </tr>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import DemoPersonaBar from './components/DemoPersonaBar';
+import Sidebar from './components/Sidebar';
+import TopHeader from './components/TopHeader';
 import DashboardTab from './components/DashboardTab';
 import PosTab from './components/PosTab';
 import InventoryTab from './components/InventoryTab';
@@ -22,13 +22,11 @@ export default function App() {
   const [allInventory, setAllInventory] = useState([]);
   const [toast, setToast] = useState(null);
 
-  // Initialize demo session on launch
   useEffect(() => {
     const existing = getStoredUser();
     if (existing) {
       setCurrentUser(existing);
     } else {
-      // Auto-login as Owner for instant preview
       handleSwitchPersona('owner');
     }
     loadMasterInventory();
@@ -56,7 +54,6 @@ export default function App() {
         setCurrentUser(res.data.user);
         showToast(res.message);
 
-        // Adjust tab if staff cannot access certain views
         if (res.data.user.role === 'staff' && (activeTab === 'dashboard' || activeTab === 'branches')) {
           setActiveTab('pos');
         }
@@ -75,7 +72,7 @@ export default function App() {
   function handleOrderComplete(newOrder) {
     setReceiptData(newOrder);
     loadMasterInventory();
-    showToast(`Order #${newOrder.orderNumber} placed & billed!`);
+    showToast(`Order #${newOrder.orderNumber} billed successfully!`);
   }
 
   function handleOpenRestock(item) {
@@ -87,40 +84,53 @@ export default function App() {
     setTransferModalOpen(true);
   }
 
-  return (
-    <div className="app-container">
-      {/* Recruiter persona bar */}
-      <DemoPersonaBar currentUser={currentUser} onSwitchPersona={handleSwitchPersona} />
+  const tabTitles = {
+    pos: { title: 'Point of Sale & Orders', subtitle: 'Live customer checkout and recipe-driven inventory deduction' },
+    dashboard: { title: 'Sales Analytics & Reports', subtitle: 'Branch revenue performance, daily trend lines, and order statistics' },
+    inventory: { title: 'Raw Material Inventory', subtitle: 'Real-time ingredient levels, low-stock triggers, and inter-branch transfers' },
+    branches: { title: 'Goa Outlets & Team', subtitle: 'Multi-branch locations and staff role-based access control (RBAC)' }
+  };
 
-      {/* Main navigation */}
-      <Navbar
+  return (
+    <div className="app-layout">
+      {/* Left Sidebar (GoMeal style) */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         currentUser={currentUser}
         onLogout={handleLogout}
-        openLoginModal={() => setLoginModalOpen(true)}
+        onOpenLogin={() => setLoginModalOpen(true)}
       />
 
-      {/* Main Tab Screen */}
-      <main className="main-content">
-        {activeTab === 'pos' && (
-          <PosTab currentUser={currentUser} onOrderComplete={handleOrderComplete} />
-        )}
+      {/* Main Wrapper */}
+      <div className="main-wrapper">
+        <TopHeader
+          title={tabTitles[activeTab]?.title}
+          subtitle={tabTitles[activeTab]?.subtitle}
+          currentUser={currentUser}
+          onSwitchPersona={handleSwitchPersona}
+        />
 
-        {activeTab === 'dashboard' && (
-          <DashboardTab currentUser={currentUser} onViewReceipt={(order) => setReceiptData(order)} />
-        )}
+        <div className="content-body">
+          {activeTab === 'pos' && (
+            <PosTab currentUser={currentUser} onOrderComplete={handleOrderComplete} />
+          )}
 
-        {activeTab === 'inventory' && (
-          <InventoryTab
-            currentUser={currentUser}
-            onOpenRestock={handleOpenRestock}
-            onOpenTransfer={handleOpenTransfer}
-          />
-        )}
+          {activeTab === 'dashboard' && (
+            <DashboardTab currentUser={currentUser} onViewReceipt={(order) => setReceiptData(order)} />
+          )}
 
-        {activeTab === 'branches' && <BranchesTab currentUser={currentUser} />}
-      </main>
+          {activeTab === 'inventory' && (
+            <InventoryTab
+              currentUser={currentUser}
+              onOpenRestock={handleOpenRestock}
+              onOpenTransfer={handleOpenTransfer}
+            />
+          )}
+
+          {activeTab === 'branches' && <BranchesTab currentUser={currentUser} />}
+        </div>
+      </div>
 
       {/* Modals */}
       <ReceiptModal receiptData={receiptData} onClose={() => setReceiptData(null)} />
@@ -155,10 +165,27 @@ export default function App() {
         }}
       />
 
-      {/* Toast popup */}
+      {/* Toast Alert */}
       {toast && (
-        <div className="toast-notice">
-          <span style={{ fontSize: '16px' }}>☕</span>
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            background: '#ffffff',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'var(--shadow-modal)',
+            padding: '12px 18px',
+            borderRadius: 'var(--radius-md)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '13px',
+            fontWeight: 500,
+            zIndex: 100
+          }}
+        >
+          <span>☕</span>
           <span>{toast}</span>
         </div>
       )}

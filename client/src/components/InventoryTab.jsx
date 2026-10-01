@@ -60,149 +60,118 @@ export default function InventoryTab({
 
   return (
     <div>
-      {/* Top Filter & Actions Header */}
-      <div className="filter-bar">
+      {/* Header and Controls */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2>Real-Time Inventory & Material Ledger</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
-            Multi-branch stock levels, automated POS recipe consumption, and inter-outlet logistics
+          <h2 style={{ fontSize: '18px', fontWeight: 700 }}>Raw Material Inventory & Stock Control</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
+            Outlet-specific ingredient levels with automated POS recipe deductions
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Branch filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {currentUser?.role === 'owner' ? (
-            <div className="branch-select-group">
-              <Store size={16} color="var(--accent-primary)" />
-              <select
-                className="custom-select"
-                value={selectedBranchId}
-                onChange={(e) => setSelectedBranchId(e.target.value)}
-              >
-                <option value="">All Branches</option>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              className="form-input-clean"
+              value={selectedBranchId}
+              onChange={(e) => setSelectedBranchId(e.target.value)}
+              style={{ fontWeight: 500 }}
+            >
+              <option value="">All Outlets</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
           ) : (
-            <div className="branch-pill">
-              <Store size={14} color="var(--accent-primary)" />
-              <span>{currentUser?.branchName || 'Assigned Branch'}</span>
+            <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--brand-primary)', background: '#ffffff', border: '1px solid var(--border-color)', padding: '6px 12px', borderRadius: 'var(--radius-md)' }}>
+              {currentUser?.branchName}
             </div>
           )}
 
-          {/* Quick Action buttons */}
           {isOwnerOrManager && (
             <>
-              <button className="btn-secondary" onClick={() => onOpenRestock(inventory)}>
+              <button className="btn-solid-primary" style={{ padding: '8px 14px', width: 'auto' }} onClick={() => onOpenRestock(inventory)}>
                 <PlusCircle size={15} />
-                <span>Restock / Adjust</span>
+                <span>Restock</span>
               </button>
-
-              <button className="btn-secondary" onClick={() => onOpenTransfer(inventory)}>
+              <button className="btn-outline-neutral" onClick={() => onOpenTransfer(inventory)}>
                 <ArrowRightLeft size={15} />
-                <span>Transfer Stock</span>
+                <span>Transfer</span>
               </button>
             </>
           )}
 
-          <button
-            className="btn-secondary"
-            style={{ padding: '8px 10px' }}
-            onClick={loadInventoryData}
-            title="Refresh Stock Levels"
-          >
-            <RefreshCw size={15} />
+          <button className="btn-outline-neutral" style={{ padding: '8px 10px' }} onClick={loadInventoryData} title="Refresh">
+            <RefreshCw size={14} />
           </button>
         </div>
       </div>
 
-      {/* Low Stock Warning Alert Banner */}
+      {/* Low Stock Warning Alert */}
       {lowStockItems.length > 0 && (
         <div
           style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.35)',
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
             borderRadius: 'var(--radius-md)',
-            padding: '14px 18px',
-            marginBottom: '20px',
+            padding: '12px 16px',
+            marginBottom: '18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '12px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: 'rgba(239, 68, 68, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--status-danger)'
-              }}
-            >
-              <AlertTriangle size={20} />
-            </div>
-            <div>
-              <div style={{ fontWeight: 700, color: 'var(--status-danger)', fontSize: '14px' }}>
-                Stock Warning: {lowStockItems.length} material(s) reached minimum reorder threshold!
-              </div>
-              <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                {lowStockItems.map((i) => `${i.item_name} at ${i.branch_name} (${i.current_stock} ${i.unit})`).join(' • ')}
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <AlertTriangle size={18} color="var(--status-danger)" />
+            <div style={{ fontSize: '13px' }}>
+              <strong style={{ color: 'var(--status-danger)' }}>Low Stock Warning:</strong>{' '}
+              {lowStockItems.map((i) => `${i.item_name} at ${i.branch_name} (${i.current_stock} ${i.unit})`).join(' • ')}
             </div>
           </div>
 
           {isOwnerOrManager && (
             <button
-              className="btn-primary"
-              style={{ width: 'auto', padding: '6px 14px', fontSize: '12.5px', margin: 0 }}
+              className="btn-solid-primary"
+              style={{ padding: '4px 12px', fontSize: '11.5px', width: 'auto' }}
               onClick={() => onOpenRestock(lowStockItems[0])}
             >
-              Restock Now
+              Restock Item
             </button>
           )}
         </div>
       )}
 
-      {/* Sub Tabs: Live Stock vs Audit Logs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+      {/* View Toggle */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
         <button
-          className={`demo-persona-btn ${activeSubView === 'stock' ? 'active' : ''}`}
+          className={`persona-btn-pill ${activeSubView === 'stock' ? 'active' : ''}`}
           onClick={() => setActiveSubView('stock')}
         >
-          <Package size={14} />
-          <span>Active Stock Inventory ({inventory.length})</span>
+          Active Stock Items ({inventory.length})
         </button>
         <button
-          className={`demo-persona-btn ${activeSubView === 'logs' ? 'active' : ''}`}
+          className={`persona-btn-pill ${activeSubView === 'logs' ? 'active' : ''}`}
           onClick={() => setActiveSubView('logs')}
         >
-          <History size={14} />
-          <span>Stock Movement Audit Logs ({logs.length})</span>
+          Stock Movement Logs ({logs.length})
         </button>
       </div>
 
       {activeSubView === 'stock' ? (
-        /* Inventory Table */
-        <div className="card" style={{ padding: 0 }}>
-          <div className="data-table-container" style={{ border: 'none' }}>
-            <table className="data-table">
+        <div className="clean-card" style={{ padding: 0 }}>
+          <div className="table-responsive" style={{ border: 'none' }}>
+            <table className="clean-table">
               <thead>
                 <tr>
-                  <th>Ingredient / Material</th>
-                  <th>Outlet Branch</th>
+                  <th>Material Item</th>
+                  <th>Branch Outlet</th>
                   <th>Category</th>
-                  <th>Available Stock</th>
-                  <th>Min Safety Level</th>
-                  <th>Stock Health Bar</th>
+                  <th>Current Stock</th>
+                  <th>Safety Min</th>
+                  <th>Stock Health</th>
                   <th>Unit Cost</th>
                   <th>Status</th>
                   {isOwnerOrManager && <th>Action</th>}
@@ -217,41 +186,27 @@ export default function InventoryTab({
                   return (
                     <tr key={item.id}>
                       <td>
-                        <strong style={{ fontSize: '13.5px' }}>{item.item_name}</strong>
+                        <strong>{item.item_name}</strong>
                       </td>
+                      <td style={{ color: 'var(--text-muted)' }}>{item.branch_name}</td>
                       <td>
-                        <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                          {item.branch_name}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          style={{
-                            background: 'var(--bg-tertiary)',
-                            padding: '3px 8px',
-                            borderRadius: 'var(--radius-sm)',
-                            fontSize: '11.5px',
-                            color: 'var(--text-muted)'
-                          }}
-                        >
+                        <span style={{ background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', color: '#475569' }}>
                           {item.category}
                         </span>
                       </td>
                       <td>
-                        <strong style={{ fontSize: '14px', color: item.is_low_stock ? 'var(--status-danger)' : 'var(--text-primary)' }}>
+                        <strong style={{ color: item.is_low_stock ? 'var(--status-danger)' : 'var(--text-main)' }}>
                           {stock} {item.unit}
                         </strong>
                       </td>
-                      <td>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
-                          {min} {item.unit}
-                        </span>
+                      <td style={{ color: 'var(--text-muted)' }}>
+                        {min} {item.unit}
                       </td>
-                      <td style={{ minWidth: '120px' }}>
-                        <div style={{ width: '100%', height: '6px', background: 'var(--bg-input)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <td style={{ minWidth: '100px' }}>
+                        <div style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
                           <div
                             style={{
-                              width: `${Math.max(5, pct)}%`,
+                              width: `${Math.max(6, pct)}%`,
                               height: '100%',
                               background: item.is_low_stock ? 'var(--status-danger)' : 'var(--status-success)',
                               borderRadius: '3px'
@@ -259,25 +214,19 @@ export default function InventoryTab({
                           />
                         </div>
                       </td>
-                      <td>
-                        <span style={{ fontSize: '12.5px' }}>₹{Number(item.cost_per_unit).toFixed(2)}</span>
-                      </td>
+                      <td>₹{Number(item.cost_per_unit).toFixed(2)}</td>
                       <td>
                         {item.is_low_stock ? (
-                          <span className="badge badge-danger">
-                            <AlertTriangle size={11} /> Low Stock
-                          </span>
+                          <span className="pill-badge badge-red">Low Stock</span>
                         ) : (
-                          <span className="badge badge-success">
-                            <CheckCircle2 size={11} /> Healthy
-                          </span>
+                          <span className="pill-badge badge-green">Healthy</span>
                         )}
                       </td>
                       {isOwnerOrManager && (
                         <td>
                           <button
-                            className="btn-secondary"
-                            style={{ padding: '3px 8px', fontSize: '11.5px' }}
+                            className="btn-outline-neutral"
+                            style={{ padding: '3px 8px', fontSize: '11px' }}
                             onClick={() => onOpenRestock(item)}
                           >
                             + Restock
@@ -292,18 +241,17 @@ export default function InventoryTab({
           </div>
         </div>
       ) : (
-        /* Audit Logs Table */
-        <div className="card" style={{ padding: 0 }}>
-          <div className="data-table-container" style={{ border: 'none' }}>
-            <table className="data-table">
+        <div className="clean-card" style={{ padding: 0 }}>
+          <div className="table-responsive" style={{ border: 'none' }}>
+            <table className="clean-table">
               <thead>
                 <tr>
-                  <th>Timestamp</th>
-                  <th>Branch</th>
+                  <th>Time</th>
+                  <th>Outlet</th>
                   <th>Item</th>
-                  <th>Movement Type</th>
+                  <th>Type</th>
                   <th>Quantity Delta</th>
-                  <th>Audit Note</th>
+                  <th>Notes</th>
                   <th>Authorized By</th>
                 </tr>
               </thead>
@@ -311,11 +259,11 @@ export default function InventoryTab({
                 {logs.map((log) => {
                   const isPositive = Number(log.change_amount) > 0;
                   const typeLabelMap = {
-                    order_deduction: 'POS Order Deduction',
-                    manual_restock: 'Manual Replenishment',
-                    spoilage_waste: 'Waste / Spoilage',
-                    transfer_in: 'Transfer Received',
-                    transfer_out: 'Transfer Dispatched'
+                    order_deduction: 'Order Consumption',
+                    manual_restock: 'Supplier Restock',
+                    spoilage_waste: 'Waste / Loss',
+                    transfer_in: 'Transfer In',
+                    transfer_out: 'Transfer Out'
                   };
 
                   return (
@@ -328,25 +276,17 @@ export default function InventoryTab({
                         <strong>{log.item_name}</strong>
                       </td>
                       <td>
-                        <span className={`badge ${isPositive ? 'badge-success' : 'badge-warning'}`}>
+                        <span className={`pill-badge ${isPositive ? 'badge-green' : 'badge-amber'}`}>
                           {typeLabelMap[log.type] || log.type}
                         </span>
                       </td>
                       <td>
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            fontFamily: 'var(--font-mono)',
-                            color: isPositive ? 'var(--status-success)' : 'var(--status-danger)'
-                          }}
-                        >
+                        <strong style={{ color: isPositive ? 'var(--status-success)' : 'var(--status-danger)', fontFamily: 'var(--font-mono)' }}>
                           {isPositive ? `+${log.change_amount}` : log.change_amount} {log.unit}
-                        </span>
+                        </strong>
                       </td>
-                      <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{log.notes || '-'}</td>
-                      <td>
-                        <span style={{ fontSize: '12px' }}>{log.performed_by || 'System Automation'}</span>
-                      </td>
+                      <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{log.notes || '-'}</td>
+                      <td>{log.performed_by || 'Auto Deduction'}</td>
                     </tr>
                   );
                 })}
