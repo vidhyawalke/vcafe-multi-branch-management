@@ -1,32 +1,20 @@
 {
-  "name": "vcafe-server",
+  "name": "brewhub-server",
   "version": "1.0.0",
-  "description": "Backend REST API for VCafe Multi-Branch Cafe Management System",
-  "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "seed": "node src/db/seed.js",
-    "db:postgres": "node src/db/setupPostgres.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
-  "keywords": [
-    "cafe-management",
-    "pos",
-    "inventory",
-    "multi-branch",
-    "express",
-    "postgresql",
-    "jwt"
-  ],
-  "author": "Vidhya Walke",
-  "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.13.1",
-    "sqlite3": "^5.1.7"
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

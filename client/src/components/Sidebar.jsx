@@ -1,111 +1,71 @@
-import React from 'react';
 import {
-  Coffee,
   LayoutDashboard,
-  ShoppingCart,
-  Package,
   Store,
+  Coffee,
+  ShoppingBag,
   LogOut,
-  User,
-  ShieldCheck
-} from 'lucide-react';
+  ChevronDown
+} from "lucide-react";
 
-export default function Sidebar({ activeTab, setActiveTab, currentUser, onLogout, onOpenLogin }) {
-  const isOwnerOrManager = currentUser?.role === 'owner' || currentUser?.role === 'manager';
+export default function Sidebar({ active, setActive, user, onLogout }) {
+  const items = [
+    { id: "dashboard", label: "Overview", icon: LayoutDashboard },
+    { id: "orders", label: "Orders", icon: ShoppingBag },
+    { id: "menu", label: "Menu", icon: Coffee },
+    { id: "branches", label: "Branches", icon: Store }
+  ];
 
   return (
     <aside className="sidebar">
-      {/* Brand Header */}
-      <div className="sidebar-logo">
-        <div className="logo-badge">
-          <Coffee size={20} strokeWidth={2.4} />
-        </div>
+      <div className="brand">
+        <div className="brand-mark">B</div>
         <div>
-          <div className="logo-text">
-            V<span>Cafe</span>
-          </div>
-          <div className="logo-sub">Multi-Branch ERP</div>
+          <strong>BrewHub</strong>
+          <span>cafe operations</span>
         </div>
       </div>
 
-      {/* Main Navigation Links (GoMeal Style) */}
-      <nav className="sidebar-nav">
-        <button
-          className={`nav-item-btn ${activeTab === 'pos' ? 'active' : ''}`}
-          onClick={() => setActiveTab('pos')}
-        >
-          <ShoppingCart size={18} />
-          <span>Point of Sale</span>
+      <div className="workspace">
+        <div className="workspace-label">WORKSPACE</div>
+        <button className="branch-switcher">
+          <span className="mini-avatar">P</span>
+          <span className="branch-text">
+            <strong>{user?.role === "ADMIN" ? "All branches" : "Panjim Cafe"}</strong>
+            <small>{user?.role || "STAFF"}</small>
+          </span>
+          <ChevronDown size={16} />
         </button>
+      </div>
 
-        {isOwnerOrManager && (
-          <button
-            className={`nav-item-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <LayoutDashboard size={18} />
-            <span>Sales Analytics</span>
-          </button>
-        )}
-
-        <button
-          className={`nav-item-btn ${activeTab === 'inventory' ? 'active' : ''}`}
-          onClick={() => setActiveTab('inventory')}
-        >
-          <Package size={18} />
-          <span>Stock & Inventory</span>
-        </button>
-
-        {isOwnerOrManager && (
-          <button
-            className={`nav-item-btn ${activeTab === 'branches' ? 'active' : ''}`}
-            onClick={() => setActiveTab('branches')}
-          >
-            <Store size={18} />
-            <span>Outlets & Staff</span>
-          </button>
-        )}
+      <nav>
+        <div className="nav-label">MANAGE</div>
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              className={`nav-item ${active === item.id ? "active" : ""}`}
+              onClick={() => setActive(item.id)}
+            >
+              <Icon size={18} />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
       </nav>
 
-      {/* User Footer Profile */}
-      <div className="sidebar-footer">
-        {currentUser ? (
-          <div className="sidebar-user-card">
-            <div className="user-avatar-circle">
-              {currentUser.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .substring(0, 2)}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, truncate: 'true' }}>
-                {currentUser.name}
-              </div>
-              <div style={{ fontSize: '11px', color: 'var(--brand-primary)', fontWeight: 600, textTransform: 'capitalize' }}>
-                {currentUser.role} • {currentUser.branchCode || 'All'}
-              </div>
-            </div>
-            <button
-              onClick={onLogout}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                padding: '4px'
-              }}
-              title="Sign Out"
-            >
-              <LogOut size={16} />
-            </button>
+      <div className="sidebar-bottom">
+        <div className="user-card">
+          <div className="user-avatar">{user?.name?.charAt(0) || "B"}</div>
+          <div>
+            <strong>{user?.name || "BrewHub User"}</strong>
+            <small>{user?.role || "STAFF"}</small>
           </div>
-        ) : (
-          <button className="btn-solid-primary" onClick={onOpenLogin}>
-            <User size={15} />
-            <span>Sign In</span>
-          </button>
-        )}
+        </div>
+        <button className="logout-button" onClick={onLogout}>
+          <LogOut size={17} />
+          Sign out
+        </button>
       </div>
     </aside>
   );
