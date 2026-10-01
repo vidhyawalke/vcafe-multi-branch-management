@@ -1,0 +1,26 @@
+{
+  "name": "vcafe-multi-branch-management",
+  "version": "1.0.0",
+  "description": "VCafe - Cloud-Based Multi-Branch Cafe & POS Management System with Role-Based Access Control and Real-Time Inventory Tracking",
+  "scripts": {
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "seed": "npm run seed --prefix server",
+    "build:client": "npm run build --prefix client",
+    "install:all": "npm install --prefix server && npm install --prefix client"
+  },
+  "keywords": [
+    "multi-branch",
+    "cafe-management",
+    "pos-system",
+    "inventory-control",
+    "react",
+    "node",
+    "express",
+    "postgresql",
+    "jwt",
+    "full-stack"
+  ],
+  "author": "Vidhya Walke <vidhya.walke.official@gmail.com>",
+  "license": "MIT"
+}
