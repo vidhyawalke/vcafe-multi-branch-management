@@ -4,67 +4,71 @@ import {
   Coffee,
   ShoppingBag,
   LogOut,
-  ChevronDown
+  MapPin
 } from "lucide-react";
 
 export default function Sidebar({ active, setActive, user, onLogout }) {
   const items = [
-    { id: "dashboard", label: "Overview", icon: LayoutDashboard },
-    { id: "orders", label: "Orders", icon: ShoppingBag },
-    { id: "menu", label: "Menu", icon: Coffee },
-    { id: "branches", label: "Branches", icon: Store }
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "orders", label: "Orders & POS", icon: ShoppingBag },
+    { id: "menu", label: "Menu Catalogue", icon: Coffee },
+    { id: "branches", label: "Branch Network", icon: Store }
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="brand">
-        <div className="brand-mark">B</div>
-        <div>
-          <strong>BrewHub</strong>
-          <span>cafe operations</span>
+    <aside className="app-sidebar">
+      <div className="sidebar-brand">
+        <div className="brand-icon-box">
+          <Coffee size={18} />
+        </div>
+        <div className="brand-text">
+          <span className="brand-title">BrewHub</span>
+          <span className="brand-tag">Operations Portal</span>
         </div>
       </div>
 
-      <div className="workspace">
-        <div className="workspace-label">WORKSPACE</div>
-        <button className="branch-switcher">
-          <span className="mini-avatar">P</span>
-          <span className="branch-text">
-            <strong>{user?.role === "ADMIN" ? "All branches" : "Panjim Cafe"}</strong>
-            <small>{user?.role || "STAFF"}</small>
-          </span>
-          <ChevronDown size={16} />
-        </button>
+      <div className="sidebar-branch-info">
+        <div className="branch-info-header">
+          <MapPin size={13} />
+          <span>ACTIVE BRANCH</span>
+        </div>
+        <div className="branch-info-name">
+          {user?.role === "ADMIN" ? "All Locations (HQ View)" : "Panjim Cafe Branch"}
+        </div>
+        <div className="branch-role-badge">
+          Role: {user?.role || "STAFF"}
+        </div>
       </div>
 
-      <nav>
-        <div className="nav-label">MANAGE</div>
+      <nav className="sidebar-nav">
+        <div className="nav-section-title">MANAGEMENT</div>
         {items.map((item) => {
           const Icon = item.icon;
+          const isActive = active === item.id;
           return (
             <button
               key={item.id}
-              className={`nav-item ${active === item.id ? "active" : ""}`}
+              className={`nav-btn ${isActive ? "active" : ""}`}
               onClick={() => setActive(item.id)}
             >
-              <Icon size={18} />
+              <Icon size={17} className="nav-icon" />
               <span>{item.label}</span>
             </button>
           );
         })}
       </nav>
 
-      <div className="sidebar-bottom">
-        <div className="user-card">
-          <div className="user-avatar">{user?.name?.charAt(0) || "B"}</div>
-          <div>
-            <strong>{user?.name || "BrewHub User"}</strong>
-            <small>{user?.role || "STAFF"}</small>
+      <div className="sidebar-footer">
+        <div className="user-profile">
+          <div className="user-avatar">{user?.name?.charAt(0) || "U"}</div>
+          <div className="user-details">
+            <span className="user-name">{user?.name || "User"}</span>
+            <span className="user-email">{user?.email || "user@brewhub.com"}</span>
           </div>
         </div>
-        <button className="logout-button" onClick={onLogout}>
-          <LogOut size={17} />
-          Sign out
+        <button className="btn-logout" onClick={onLogout} title="Sign out">
+          <LogOut size={15} />
+          <span>Sign out</span>
         </button>
       </div>
     </aside>

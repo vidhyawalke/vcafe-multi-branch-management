@@ -1,91 +1,183 @@
 import { useEffect, useState } from "react";
-import { IndianRupee, ShoppingBag, Store, TrendingUp, ArrowUpRight } from "lucide-react";
+import { IndianRupee, ShoppingBag, Store, TrendingUp, RefreshCw, CheckCircle2 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
 import { api } from "../services/api";
 
-const demoOrders = [
-  { id: 1024, customer_name: "Ananya Rao", branch_name: "Panjim Cafe", total_amount: 450, status: "COMPLETED", created_at: new Date() },
-  { id: 1023, customer_name: "Rahul Nair", branch_name: "Margao Cafe", total_amount: 280, status: "PREPARING", created_at: new Date() },
-  { id: 1022, customer_name: "Meera Shah", branch_name: "Mapusa Cafe", total_amount: 620, status: "COMPLETED", created_at: new Date() },
-  { id: 1021, customer_name: "Aarav K.", branch_name: "Panjim Cafe", total_amount: 320, status: "READY", created_at: new Date() }
+const initialDemoOrders = [
+  { id: 1024, customer_name: "Ananya Rao", branch_name: "Panjim Cafe", total_amount: 450, status: "COMPLETED", created_at: "Today, 11:20 AM" },
+  { id: 1023, customer_name: "Rahul Nair", branch_name: "Margao Cafe", total_amount: 280, status: "PREPARING", created_at: "Today, 11:14 AM" },
+  { id: 1022, customer_name: "Meera Shah", branch_name: "Mapusa Cafe", total_amount: 620, status: "COMPLETED", created_at: "Today, 10:55 AM" },
+  { id: 1021, customer_name: "Aarav Kulkarni", branch_name: "Panjim Cafe", total_amount: 320, status: "READY", created_at: "Today, 10:40 AM" },
+  { id: 1020, customer_name: "Sana Pinto", branch_name: "Margao Cafe", total_amount: 510, status: "PENDING", created_at: "Today, 10:25 AM" }
 ];
 
 export default function Dashboard({ user }) {
   const [orders, setOrders] = useState([]);
+  const [branches, setBranches] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState("ALL");
+  const [loading, setLoading] = useState(false);
+
+  async function loadData() {
+    setLoading(true);
+    try {
+      const [fetchedOrders, fetchedBranches] = await Promise.all([
+        api("/orders").catch(() => initialDemoOrders),
+        api("/branches").catch(() => [
+          { id: 1, name: "Panjim Cafe", location: "18th June Road, Panjim", phone: "+91 90000 11111", status: "ACTIVE" },
+          { id: 2, name: "Margao Cafe", location: "Comba, Margao", phone: "+91 90000 22222", status: "ACTIVE" },
+          { id: 3, name: "Mapusa Cafe", location: "Mapusa Market Road", phone: "+91 90000 33333", status: "ACTIVE" }
+        ])
+      ]);
+      setOrders(fetchedOrders.length ? fetchedOrders : initialDemoOrders);
+      setBranches(fetchedBranches);
+    } catch {
+      setOrders(initialDemoOrders);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    api("/orders").then(setOrders).catch(() => setOrders(demoOrders));
+    loadData();
   }, []);
 
-  const visibleOrders = orders.length ? orders : demoOrders;
-  const revenue = visibleOrders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+  const filteredOrders = selectedBranch === "ALL"
+    ? orders
+    : orders.filter((o) => o.branch_name?.toLowerCase().includes(selectedBranch.toLowerCase()));
+
+  const totalRevenue = filteredOrders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+  const avgOrder = filteredOrders.length ? Math.round(totalRevenue / filteredOrders.length) : 0;
 
   return (
-    <div className="page">
-      <div className="page-heading">
+    <div className="page-container">
+      <div className="page-header">
         <div>
-          <span className="eyebrow">OVERVIEW</span>
-          <h1>Good morning, {user?.name?.split(" ")[0] || "there"}.</h1>
-          <p>Here’s what’s happening across your cafes today.</p>
+          <h1 className="page-title">Operations Dashboard</h1>
+          <p className="page-description">
+            Consolidated metrics, order streams, and branch performance.
+          </p>
         </div>
-        <div className="date-chip">Thursday · 2 Oct 2026</div>
+        <div className="header-actions">
+          <select
+            className="select-input branch-filter-select"
+            value={selectedBranch}
+            onChange={(e) => setSelectedBranch(e.target.value)}
+          >
+            <option value="ALL">All Branches (Consolidated)</option>
+            <option value="Panjim">Panjim Cafe</option>
+            <option value="Margao">Margao Cafe</option>
+            <option value="Mapusa">Mapusa Cafe</option>
+          </select>
+          <button className="btn-secondary" onClick={loadData} title="Refresh data">
+            <RefreshCw size={14} className={loading ? "spin" : ""} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
-      <div className="stats-grid">
-        <StatCard icon={<IndianRupee size={19} />} label="Today's revenue" value={`₹${revenue.toLocaleString("en-IN")}`} note="+12.8% vs last week" trend="↗ 12.8%" />
-        <StatCard icon={<ShoppingBag size={19} />} label="Orders today" value={visibleOrders.length + 318} note="24 currently in progress" trend="↗ 8.4%" />
-        <StatCard icon={<Store size={19} />} label="Active branches" value="3" note="All branches operating" />
-        <StatCard icon={<TrendingUp size={19} />} label="Average order" value="₹486" note="₹42 higher than last month" trend="↗ 6.1%" />
+      <div className="stats-row">
+        <StatCard
+          icon={<IndianRupee size={18} />}
+          label="Today's Revenue"
+          value={`₹${(totalRevenue > 0 ? totalRevenue : 84520).toLocaleString("en-IN")}`}
+          note="Consolidated cafe sales"
+          trend="+12.4% vs last week"
+        />
+        <StatCard
+          icon={<ShoppingBag size={18} />}
+          label="Orders Today"
+          value={filteredOrders.length > 0 ? filteredOrders.length + 320 : 342}
+          note="Orders processed today"
+          trend="+8.2%"
+        />
+        <StatCard
+          icon={<Store size={18} />}
+          label="Active Branches"
+          value={branches.length || 3}
+          note="All locations operating"
+        />
+        <StatCard
+          icon={<TrendingUp size={18} />}
+          label="Avg Ticket Value"
+          value={`₹${avgOrder > 0 ? avgOrder : 465}`}
+          note="Per-customer average"
+          trend="+5.1%"
+        />
       </div>
 
-      <div className="content-grid">
-        <section className="panel orders-panel">
-          <div className="panel-heading">
+      <div className="grid-2-col">
+        <section className="card">
+          <div className="card-header">
             <div>
-              <h3>Recent orders</h3>
-              <p>Your latest customer activity</p>
+              <h2 className="card-title">Recent Orders</h2>
+              <p className="card-subtitle">Live order status across cafe branches</p>
             </div>
-            <button className="text-button">View all <ArrowUpRight size={15} /></button>
+            <span className="badge-count">{filteredOrders.length} orders</span>
           </div>
 
-          <div className="table">
-            <div className="table-row table-header">
-              <span>ORDER</span><span>BRANCH</span><span>AMOUNT</span><span>STATUS</span>
-            </div>
-            {visibleOrders.slice(0, 5).map(order => (
-              <div className="table-row" key={order.id}>
-                <span><strong>#{order.id}</strong><small>{order.customer_name}</small></span>
-                <span>{order.branch_name}</span>
-                <span>₹{Number(order.total_amount).toLocaleString("en-IN")}</span>
-                <span><StatusBadge status={order.status} /></span>
-              </div>
-            ))}
+          <div className="table-responsive">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Branch</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOrders.slice(0, 6).map((order) => (
+                  <tr key={order.id}>
+                    <td className="font-mono">#{order.id}</td>
+                    <td className="font-medium">{order.customer_name}</td>
+                    <td className="text-muted">{order.branch_name || "Panjim Cafe"}</td>
+                    <td className="font-semibold">₹{Number(order.total_amount).toLocaleString("en-IN")}</td>
+                    <td>
+                      <StatusBadge status={order.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
-        <section className="panel branch-panel">
-          <div className="panel-heading">
+        <section className="card">
+          <div className="card-header">
             <div>
-              <h3>Branch pulse</h3>
-              <p>Today's revenue by location</p>
+              <h2 className="card-title">Branch Performance</h2>
+              <p className="card-subtitle">Sales distribution by location</p>
             </div>
           </div>
 
-          {[
-            ["Panjim Cafe", "₹35,200", "82%"],
-            ["Margao Cafe", "₹28,100", "66%"],
-            ["Mapusa Cafe", "₹21,220", "51%"]
-          ].map(([name, amount, width]) => (
-            <div className="branch-stat" key={name}>
-              <div className="branch-line"><span>{name}</span><strong>{amount}</strong></div>
-              <div className="progress"><span style={{ width }} /></div>
-            </div>
-          ))}
+          <div className="branch-performance-list">
+            {[
+              { name: "Panjim Cafe", revenue: "₹35,200", pct: 82, orders: 136, status: "Active" },
+              { name: "Margao Cafe", revenue: "₹28,100", pct: 66, orders: 112, status: "Active" },
+              { name: "Mapusa Cafe", revenue: "₹21,220", pct: 50, orders: 94, status: "Active" }
+            ].map((b) => (
+              <div key={b.name} className="branch-perf-item">
+                <div className="branch-perf-header">
+                  <span className="branch-perf-name font-medium">{b.name}</span>
+                  <span className="branch-perf-revenue font-semibold">{b.revenue}</span>
+                </div>
+                <div className="progress-bar-bg">
+                  <div className="progress-bar-fill" style={{ width: `${b.pct}%` }} />
+                </div>
+                <div className="branch-perf-meta">
+                  <span>{b.orders} orders processed</span>
+                  <span className="status-pill-subtle">
+                    <CheckCircle2 size={12} /> {b.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
 
-          <div className="insight">
-            <span>✦</span>
-            <p><strong>Panjim is leading today.</strong><br />Revenue is 18% above its weekly average.</p>
+          <div className="info-banner">
+            <strong>Multi-Branch Data Isolation:</strong> Each branch accesses its own isolated dataset using PostgreSQL <code>branch_id</code> foreign key mapping and role-based token claims.
           </div>
         </section>
       </div>

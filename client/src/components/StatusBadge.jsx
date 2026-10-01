@@ -1,8 +1,9 @@
 export default function StatusBadge({ status }) {
+  const normStatus = (status || "PENDING").toUpperCase();
   return (
-    <span className={`status ${status?.toLowerCase()}`}>
+    <span className={`status-badge status-${normStatus.toLowerCase()}`}>
       <span className="status-dot" />
-      {status}
+      {normStatus}
     </span>
   );
 }

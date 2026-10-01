@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { Coffee, ArrowRight, Lock, Mail } from "lucide-react";
+import { Coffee, Mail, Lock, Eye, EyeOff, ShieldCheck, UserCheck } from "lucide-react";
 import { api } from "../services/api";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("admin@brewhub.com");
   const [password, setPassword] = useState("password123");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  function selectRole(demoEmail) {
+    setEmail(demoEmail);
+    setPassword("password123");
+    setError("");
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -23,61 +30,96 @@ export default function Login({ onLogin }) {
       localStorage.setItem("brewhub_user", JSON.stringify(data.user));
       onLogin(data.user);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to authenticate. Please check your credentials.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="login-page">
-      <div className="login-art">
-        <div className="art-glow glow-one" />
-        <div className="art-glow glow-two" />
-        <div className="coffee-cup">
-          <Coffee size={58} strokeWidth={1.4} />
-        </div>
-        <div className="art-copy">
-          <span className="eyebrow">BREWHUB</span>
-          <h1>Good coffee.<br /><em>Better operations.</em></h1>
-          <p>One calm workspace for every cafe you run.</p>
-        </div>
-      </div>
-
-      <div className="login-panel">
-        <div className="login-form-wrap">
-          <div className="mobile-brand"><Coffee size={22} /> BrewHub</div>
-          <div className="login-heading">
-            <span className="eyebrow">WELCOME BACK</span>
-            <h2>Run your cafes<br />with clarity.</h2>
-            <p>Sign in to your BrewHub workspace.</p>
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <div className="brand-badge">
+            <Coffee size={22} className="brand-icon" />
           </div>
+          <h2>BrewHub</h2>
+          <p className="login-subtitle">Multi-Branch Cafe Management & POS</p>
+        </div>
 
-          <form onSubmit={handleSubmit}>
-            <label>Email address</label>
-            <div className="input-wrap">
-              <Mail size={17} />
-              <input value={email} onChange={e => setEmail(e.target.value)} type="email" />
-            </div>
-
-            <label>Password</label>
-            <div className="input-wrap">
-              <Lock size={17} />
-              <input value={password} onChange={e => setPassword(e.target.value)} type="password" />
-            </div>
-
-            {error && <div className="error-box">{error}</div>}
-
-            <button className="primary-button login-button" disabled={loading}>
-              {loading ? "Signing in..." : "Sign in"}
-              {!loading && <ArrowRight size={18} />}
+        <div className="role-selector">
+          <span className="role-label">Quick Demo Access:</span>
+          <div className="role-buttons">
+            <button
+              type="button"
+              className={`role-btn ${email === "admin@brewhub.com" ? "active" : ""}`}
+              onClick={() => selectRole("admin@brewhub.com")}
+            >
+              <ShieldCheck size={14} />
+              <span>Admin (HQ)</span>
             </button>
-          </form>
-
-          <div className="demo-note">
-            <strong>Demo access</strong>
-            <span>admin@brewhub.com · password123</span>
+            <button
+              type="button"
+              className={`role-btn ${email === "staff@brewhub.com" ? "active" : ""}`}
+              onClick={() => selectRole("staff@brewhub.com")}
+            >
+              <UserCheck size={14} />
+              <span>Staff (Branch)</span>
+            </button>
           </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="login-form">
+          {error && <div className="error-alert">{error}</div>}
+
+          <div className="form-group">
+            <label htmlFor="email">Email address</label>
+            <div className="input-group">
+              <Mail size={16} className="input-icon" />
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@brewhub.com"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <div className="label-row">
+              <label htmlFor="password">Password</label>
+            </div>
+            <div className="input-group">
+              <Lock size={16} className="input-icon" />
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Signing in..." : "Sign in to BrewHub"}
+          </button>
+        </form>
+
+        <div className="login-footer">
+          <span>React • Node.js Express • PostgreSQL 18</span>
         </div>
       </div>
     </div>
