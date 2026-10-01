@@ -1,12 +1,27 @@
 {
-  "rewrites": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "client": {
+      "path": "client",
+      "framework": "vite"
+    },
+    "server": {
+      "path": "server",
+      "framework": "express"
+    }
+  },
+  "routes": [
     {
       "source": "/api/(.*)",
-      "destination": "https://vcafe-management-system.onrender.com/api/$1"
+      "destination": {
+        "service": "server"
+      }
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": {
+        "service": "client"
+      }
     }
   ]
 }
