@@ -1,82 +1,132 @@
-# ☕ VCafe — Multi-Branch Operations & POS Platform
+# VCafe — Multi-Branch Cafe Management System
 
-> A cloud-based business management system engineered for multi-branch specialty cafes and dining operations. Built with React, Node.js/Express, PostgreSQL, and JWT-authenticated Role-Based Access Control (RBAC).
+A cloud-based business operations platform for multi-branch specialty cafes — live POS billing, recipe-based inventory deductions, and consolidated branch analytics.
 
----
-
-## 📖 The Origin Story
-
-> *"A specialty cafe in Goa operated two outlets—one in bustling Panjim and another along the Anjuna coastal strip. Daily operations, daily billing, and inter-branch stock replenishments were tracked across paper notebooks and ad-hoc WhatsApp messages.
->
-> During peak holiday rushes, the Anjuna outlet would suddenly run out of oat milk and artisan sourdough while Panjim had a surplus. Cash settlements at end-of-shift rarely tallied with register paper slips, and the cafe owner had zero consolidated visibility into store profitability without spending 3 hours every Sunday compiling paper totals.
->
-> I built **VCafe** to solve this exact operational friction: giving counter staff a swift POS terminal that auto-deducts raw ingredients via recipe mappings, outlet managers live stock control and replenishment logs, and the owner unified business intelligence across all branches."*
+🌐 **GitHub Repository:** [github.com/vidhyawalke/vcafe-multi-branch-management](https://github.com/vidhyawalke/vcafe-multi-branch-management)
 
 ---
 
-## 🌟 Key Features & Business Capabilities
+## What the Project Does
 
-### 1. ⚡ High-Speed POS Checkout & Thermal Invoicing
-- Fast touch-friendly menu grid with category filtering (*Espresso & Classics*, *Cold Brews & Iced Lattes*, *Artisanal Bakery*, *Gourmet Bites*).
-- Real-time cart calculations including automated 5% GST (CGST 2.5% + SGST 2.5%) and optional discounts.
-- Dine-in (with table assignment) and takeaway ticket support.
-- Multiple payment settlement modes: **UPI (GooglePay / PhonePe / QR)**, **Credit/Debit Card**, and **Cash**.
-- Instant modal generation of authentic **Thermal Print Receipts** with GSTIN, invoice numbering, line items, and print capabilities (`window.print()`).
+Managing daily operations across multiple cafe outlets often leads to operational friction — tracking stock on loose paper pads, manually tallying shift cash drawers, and lacking real-time visibility into branch inventory levels.
 
-### 2. 📦 Recipe-Driven Inventory Tracking & Stock Logistics
-- **Atomic Recipe Deductions**: Placing an order for a *Signature Flat White* automatically deducts 0.018 kg of Arabica coffee beans and 0.20 L of milk directly from that specific branch's inventory ledger.
-- **Safety Reorder Thresholds**: Real-time visual alert banners and badges trigger when ingredient levels drop below minimum operating safety stock.
-- **Supplier Replenishment & Waste Logging**: Managers can record supplier delivery receipts or write off spoilage with audit notes.
-- **Inter-Branch Stock Transfers**: Authorize and record stock transfers from the flagship branch (Panjim) to seasonal branches (Anjuna) with complete audit trail logging.
+A specialty cafe in Goa with branches in Panjim and Anjuna was experiencing ingredient run-outs during tourist rushes while the other outlet had excess stock. At the same time, end-of-day sales settlements were logged across WhatsApp messages and paper slips, making it difficult for the owner to evaluate store performance.
 
-### 3. 🛡️ Role-Based Access Control (RBAC) & Security
-- **👑 Owner (Universal Scope)**: Unrestricted access across all outlets, consolidated business intelligence, menu availability controls, and user authorization management.
-- **👔 Manager (Branch Scope)**: Manages outlet inventory, authorizes restocks and transfers, accesses branch-specific financial metrics, and supervises branch team.
-- **☕ Staff / Barista (Terminal Scope)**: Accesses high-speed POS billing, active tickets, and live material availability checks. Restricted from sensitive financial summaries and administrative settings.
-- **1-Click Recruiter Demo Switcher**: Floating banner allowing reviewers to test each role's view and permission boundaries instantly.
+The goal was to build a full-stack web application that unifies counter operations, stock replenishment, and multi-outlet business analytics into a single interface.
 
-### 4. 📊 Multi-Branch Executive Analytics
-- **Consolidated vs Branch-Level Scoping**: View company-wide totals or drill into individual outlets.
-- **Key Performance Indicators (KPIs)**: Gross Revenue, Completed Order Count, Average Order Value (AOV), and Low Stock Alerts.
-- **7-Day Revenue Trend (Custom SVG Chart)**: Visual daily revenue progression with dynamic tooltips and scaling.
-- **Top 5 Artisanal Items**: Units sold and revenue contribution ranking.
-- **Payment Method Distribution**: Percentage breakdown across UPI, Card, and Cash settlements.
+The app was built using React, Node.js, Express, and PostgreSQL. Counter staff get a touch-friendly POS billing terminal with instant thermal receipt generation, outlet managers track live inventory levels with automated low-stock warnings, and the owner gets real-time consolidated sales analytics across all branches.
+
+Whenever an order is billed, the system uses recipe mappings to automatically deduct raw ingredients (beans, milk, pastries) directly from that specific branch's inventory ledger.
 
 ---
 
-## 🏗️ System Architecture & Technology Stack
+## Why It Is Useful
 
-```
-   ┌────────────────────────────────────────────────────────┐
-   │             React 18 SPA (Vite + Vanilla CSS)          │
-   │  - POS Terminal    - Executive Analytics   - Inventory │
-   │  - Thermal Bill    - Demo Persona Switcher - RBAC UI   │
-   └───────────────────────────┬────────────────────────────┘
-                               │ HTTP / REST (JWT Bearer)
-   ┌───────────────────────────▼────────────────────────────┐
-   │             Node.js & Express REST API Server          │
-   │  - Auth & RBAC Middleware   - Recipe Deduction Engine  │
-   │  - Order Transaction Logic  - Branch Logistics Router  │
-   └───────────────────────────┬────────────────────────────┘
-                               │ Parameterized SQL ($1, $2)
-   ┌───────────────────────────▼────────────────────────────┐
-   │                  Database Storage Layer                │
-   │  - Production: PostgreSQL with Connection Pool (pg)   │
-   │  - Local / Test: Embedded SQLite zero-config fallback │
-   └────────────────────────────────────────────────────────┘
+1. **Eliminates Manual Stock Guesswork:** Menu items automatically deduct ingredients in real-time based on predefined recipe weights.
+2. **Prevents Stockouts:** Visual alert triggers notify managers when raw materials drop below safe reorder thresholds.
+3. **Role-Based Access Control:** Separate permission boundaries for Owner (all outlets), Store Managers (branch operations), and Staff (POS billing).
+4. **Instant Thermal Receipts:** Generates formatted customer receipts with tax breakdown (5% GST), invoice numbering, and print support.
+5. **Multi-Branch Visibility:** Consolidates daily revenue trends, average ticket sizes, and payment breakdowns across branches.
+6. **Dual Database Engine:** Connects to PostgreSQL for production cloud deployment or runs with zero-config local storage for instant evaluation.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js** (v18 or higher)
+- **npm** (v9 or higher)
+- *(Optional)* **PostgreSQL** installed locally on port 5432 or a cloud PostgreSQL database URL.
+
+### Installation
+
+```bash
+git clone https://github.com/vidhyawalke/vcafe-multi-branch-management.git
+cd vcafe-multi-branch-management
+npm run install:all
 ```
 
-### Technology Highlights
-- **Frontend**: React 18, Vite, Vanilla CSS Custom Properties (Warm Espresso & Bronze Design System), Lucide Icons.
-- **Backend**: Node.js, Express, JSON Web Tokens (`jsonwebtoken`), `bcryptjs` password hashing.
-- **Database Architecture**:
-  - **Dual Engine Persistence Layer**: Designed with a clean repository abstraction in [`server/src/config/db.js`](server/src/config/db.js).
-  - **Production Mode**: Uses PostgreSQL (`pg.Pool`) with SSL and connection pooling when `DATABASE_URL` is set (Render, Supabase, Neon).
-  - **Local Development Mode**: Seamlessly falls back to local SQLite storage with WAL mode when running standalone—guaranteeing 100% clone-and-run reliability without requiring a pre-installed database server!
+### Running the Application
+
+1. **Initialize and Seed Demo Data:**
+   ```bash
+   npm run seed
+   ```
+   *(Populates Panjim and Anjuna branches, 5 staff accounts, full menu items, recipe ingredients, stock levels, and sample past orders).*
+
+2. **Start Development Servers:**
+   ```bash
+   # Start backend API (runs on http://localhost:5000)
+   npm run server
+
+   # Start frontend interface (runs on http://localhost:3000)
+   npm run client
+   ```
+
+3. **(Optional) Connect Your Local PostgreSQL Database:**
+   If you have PostgreSQL installed on port 5432, run:
+   ```bash
+   npm run db:postgres -- YOUR_POSTGRES_PASSWORD
+   ```
+   This automatically creates `vcafe_db`, runs the schema DDL, seeds the data, and updates `.env`.
 
 ---
 
-## 🗄️ Database Schema & Entity Relationships
+## Features
+
+- **Touch POS Checkout —** Fast category filtering, active bill drawer, dining mode toggle (Dine In / Takeaway), table numbers, and 5% GST calculations.
+- **Recipe-Based Stock Deduction —** Ordering a Flat White automatically deducts 18g of coffee beans and 200ml of milk from the outlet's live inventory.
+- **Low-Stock Alert Banners —** Immediate visual warnings when materials drop below minimum operating safety thresholds.
+- **Stock Restock & Waste Logging —** Store managers can log supplier replenishment crates or write off spoilage with audit notes.
+- **Inter-Branch Stock Transfers —** Transfer materials between Panjim Flagship and Anjuna Coastal branches with transaction logs.
+- **Executive Sales Analytics —** Consolidated vs branch-level revenue, order counts, average order values, and 7-day revenue trend line chart.
+- **Payment Mode Settlement —** Tracks transactions across UPI, Credit/Debit Card, and Cash.
+- **1-Click Recruiter Persona Switcher —** Seamlessly test Owner, Manager, and Staff views directly from the top navigation bar.
+
+---
+
+## Project Structure
+
+```text
+vcafe-multi-branch-management/
+├── client/                      # React Frontend (Vite)
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Sidebar.jsx      # Left sidebar navigation (GoMeal style)
+│   │   │   ├── TopHeader.jsx    # Page header & recruiter persona switcher
+│   │   │   ├── PosTab.jsx       # POS menu catalog & active billing drawer
+│   │   │   ├── DashboardTab.jsx # Sales analytics & trend line chart
+│   │   │   ├── InventoryTab.jsx # Raw material ledger & stock status
+│   │   │   ├── BranchesTab.jsx  # Outlet locations & RBAC team directory
+│   │   │   ├── ReceiptModal.jsx # Authentic thermal POS receipt modal
+│   │   │   ├── RestockModal.jsx # Supplier restock & waste logger
+│   │   │   └── TransferModal.jsx# Inter-branch inventory transfer
+│   │   ├── services/
+│   │   │   └── api.js           # Fetch API client with JWT injection
+│   │   ├── App.jsx              # Main application shell
+│   │   └── index.css            # Clean, warm cafe design system
+├── server/                      # Express Backend REST API
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js            # Dual PostgreSQL & SQLite query adapter
+│   │   ├── controllers/         # Auth, Orders, Inventory, Reports, Branches
+│   │   ├── middleware/          # JWT verification & RBAC role guards
+│   │   ├── routes/              # Express API endpoints
+│   │   ├── db/
+│   │   │   ├── schema.sql       # Relational database DDL schema
+│   │   │   ├── seed.js          # Panjim & Anjuna demo data seed script
+│   │   │   └── setupPostgres.js # Local PostgreSQL automated setup script
+│   │   ├── app.js               # Express application configuration
+│   │   └── index.js             # Server startup bootstrap
+├── render.yaml                  # 1-click cloud deployment blueprint for Render
+├── vercel.json                  # Frontend hosting configuration for Vercel
+└── package.json                 # Workspace scripts
+```
+
+---
+
+## Database Schema & Entity Relationships
 
 ```mermaid
 erDiagram
@@ -98,116 +148,41 @@ erDiagram
 
 ---
 
-## 🔌 API Reference
+## Tech Stack
 
-### Authentication & Profiles (`/api/auth`)
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `POST` | `/api/auth/login` | Public | Email and password authentication; returns JWT token. |
-| `POST` | `/api/auth/demo-login` | Public | 1-click persona login (`owner`, `manager_panjim`, `staff_anjuna`). |
-| `GET` | `/api/auth/me` | Authenticated | Retrieve current user profile and branch assignment. |
-| `GET` | `/api/auth/users` | Manager / Owner | List operational staff and role permissions. |
-
-### POS & Orders (`/api/orders`)
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `POST` | `/api/orders` | Authenticated | Process new POS order with recipe stock deduction and thermal receipt. |
-| `GET` | `/api/orders` | Authenticated | Fetch paginated order transaction history. |
-| `GET` | `/api/orders/:id` | Authenticated | Fetch detailed order receipt by ID. |
-
-### Inventory & Logistics (`/api/inventory`)
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `GET` | `/api/inventory` | Authenticated | Retrieve branch stock levels with low-stock warning indicators. |
-| `POST` | `/api/inventory/adjust` | Manager / Owner | Record supplier replenishment or spoilage waste with audit log. |
-| `POST` | `/api/inventory/transfer` | Manager / Owner | Execute inter-branch ingredient transfer (Panjim <-> Anjuna). |
-| `GET` | `/api/inventory/logs` | Authenticated | View raw material stock movement audit history. |
-
-### Analytics & Reports (`/api/reports`)
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `GET` | `/api/reports/metrics` | Manager / Owner | Fetch consolidated or branch-level KPIs, 7-day revenue trend, and top items. |
+| Layer | Technology |
+|---|---|
+| **Frontend Framework** | React 18 with Vite |
+| **Styling** | Vanilla CSS3 with custom variables (Clean warm theme) |
+| **Icons** | Lucide React |
+| **Backend Framework** | Node.js & Express |
+| **Authentication** | JSON Web Tokens (`jsonwebtoken`) & `bcryptjs` |
+| **Access Control** | Role-Based Access Control (`owner`, `manager`, `staff`) |
+| **Database** | PostgreSQL (`pg-pool`) with SQLite zero-config fallback |
+| **Cloud Hosting** | Render (Web Service + PostgreSQL) & Vercel |
 
 ---
 
-## 🚀 Quick Start Guide
+## Demo Accounts
 
-### Prerequisites
-- **Node.js** (v18 or higher recommended)
-- **npm** (v9 or higher)
-
-### 1. Clone & Install
-```bash
-git clone https://github.com/VidhyaWalke/vcafe-multi-branch-management.git
-cd vcafe-multi-branch-management
-npm run install:all
-```
-
-### 2. Seed Database
-Initializes the schema with the Panjim and Anjuna branches, 5 staff accounts, full menu items, recipe ingredient links, inventory levels, and sample past transactions:
-```bash
-npm run seed
-```
-
-### 3. Launch Development Servers
-Run the backend and frontend concurrently:
-```bash
-# Terminal 1: Backend Express Server (port 5000)
-npm run server
-
-# Terminal 2: Frontend Vite React App (port 3000)
-npm run client
-```
-Open **`http://localhost:3000`** in your browser.
-
----
-
-## 🔑 Demo Login Accounts
-
-| Persona | Role | Email | Password | Branch Scope |
+| Persona | Role | Email | Password | Access Scope |
 |---|---|---|---|---|
-| **👑 Vidhya Walke** | `owner` | `owner@vcafe.com` | `admin123` | Universal (All Outlets) |
-| **👔 Rahul Deshmukh** | `manager` | `manager.panjim@vcafe.com` | `manager123` | VCafe Panjim (Flagship) |
-| **👔 Maria Fernandes** | `manager` | `manager.anjuna@vcafe.com` | `manager123` | VCafe Anjuna (Beachside) |
-| **☕ Priya Sharma** | `staff` | `staff.panjim@vcafe.com` | `staff123` | VCafe Panjim (Flagship) |
-| **☕ Kevin Lobo** | `staff` | `staff.anjuna@vcafe.com` | `staff123` | VCafe Anjuna (Beachside) |
+| **Vidhya Walke** | `owner` | `owner@vcafe.com` | `admin123` | All Goa Outlets |
+| **Rahul Deshmukh** | `manager` | `manager.panjim@vcafe.com` | `manager123` | VCafe Panjim (Flagship) |
+| **Kevin Lobo** | `staff` | `staff.anjuna@vcafe.com` | `staff123` | VCafe Anjuna (Beachside) |
 
-*(You can also use the floating "Recruiter Demo Mode" buttons at the top of the interface to switch between accounts with a single click.)*
+*(Use the demo buttons in the top navigation bar to switch personas with one click).*
 
 ---
 
-## ☁️ Production Deployment
+## Getting Help
 
-### Option A: 1-Click Deployment on Render
-A production blueprint configuration is provided in [`render.yaml`](render.yaml):
-1. Connect this repository to your **Render.com** account.
-2. Render detects `render.yaml` and spins up:
-   - A managed **PostgreSQL** database service (`vcafe_db`).
-   - A **Node.js Web Service** running the built application on a single port.
-3. Database migrations and initial seed run automatically on boot.
-
-### Option B: Frontend on Vercel + Backend on Render / Railway
-1. **Backend**: Deploy the `server/` directory with `DATABASE_URL` pointing to any PostgreSQL instance (Neon / Supabase / Render).
-2. **Frontend**: Deploy the `client/` directory to **Vercel**. Set environment variable `VITE_API_URL` or use the included [`vercel.json`](vercel.json) rewrite rule.
+If you run into issues or have questions, open a [GitHub issue](https://github.com/vidhyawalke/vcafe-multi-branch-management/issues) in this repository.
 
 ---
 
-## 💡 Engineering Tradeoffs & Architectural Decisions
+## Maintainer
 
-1. **Why Relational SQL (PostgreSQL) instead of NoSQL (MongoDB)?**
-   In retail and hospitality operations, inventory deduction and billing require strict ACID guarantees. An order cannot be billed if ingredient records fail, and stock numbers must never go out of sync across concurrent cashiers. Foreign key constraints and relational integrity between `orders`, `order_items`, and `branch_inventory` prevent data anomalies that frequently plague document stores.
+Built and maintained by [Vidhya Walke](https://github.com/vidhyawalke).
 
-2. **Why Atomic Recipe Mapping for Inventory?**
-   Traditional retail POS platforms require cashiers to manually enter how much milk or coffee was consumed. By abstracting recipes into `menu_item_ingredients`, cashiers only tap the item ordered, and the server calculates and applies deductions in the same request.
-
-3. **Why Dual-Engine Database Architecture?**
-   Technical reviewers and interviewers often have diverse local setups. Forcing an interviewer to create a PostgreSQL instance on port 5432 with specific credentials often blocks demo evaluation. By offering zero-config local persistence while retaining standard SQL and PostgreSQL connection pool readiness, the project provides maximum developer convenience without compromising enterprise production standards.
-
----
-
-## 👩‍💻 Author
-
-**Vidhya Walke**
-- **Email**: [vidhya.walke.official@gmail.com](mailto:vidhya.walke.official@gmail.com)
-- **Role**: Full Stack Developer
-- **Target Opportunity**: Wafer Technologies (Goa, India / Estonia)
+Contributions, bug reports, and suggestions are welcome via pull request or issue.
