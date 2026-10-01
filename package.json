@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "VCafe - Cloud-Based Multi-Branch Cafe & POS Management System with Role-Based Access Control and Real-Time Inventory Tracking",
   "scripts": {
+    "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+    "start": "node server/src/index.js",
     "server": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
     "seed": "npm run seed --prefix server",
